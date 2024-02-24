@@ -1,6 +1,7 @@
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Queue;
+import java.util.Stack;
 
 class Graphs{
     public static void main(String[] args) {
@@ -18,7 +19,8 @@ class Graphs{
         // }
 
         // bfs(graph,vis,v);
-        dfs(graph, 0, vis);
+        boolean[] recursion = new boolean[v];
+        System.out.println(detectCycleDirected(graph, vis, recursion, 0));
     }
 
     public static void createGraph(ArrayList<Edge>[] graph){
@@ -72,6 +74,50 @@ class Graphs{
             }
         }
     }
+
+    // Cycle detection Directed graph
+    static boolean detectCycleDirected(ArrayList<Edge>[] graph,boolean[] vis, boolean[] recursion,int curr){
+
+        vis[curr]=true;
+        recursion[curr]=true;
+        for(int i = 0;i<graph[0].size();i++){
+            Edge e = graph[0].get(i);
+            if(recursion[e.dest]) return true;
+            if(!vis[e.dest]){
+                if(detectCycleDirected(graph, vis, recursion, e.dest)) return true;
+            }
+        }
+        recursion[curr] = false;
+        return false;
+    }
+
+
+    //Topological sort : Used only on directed acyclic graph
+    static void topologicalSortUtil(ArrayList<Edge>[] graph, boolean[] vis, Stack<Integer> stack,int curr){
+        vis[curr]=true;
+        for(int i = 0;i<graph[curr].size();i++){
+            Edge e = graph[curr].get(i);
+            if(!vis[e.dest]){
+                topologicalSortUtil(graph, vis, stack, e.dest);
+            }
+        }   
+        stack.push(curr);
+    }
+    static void topologicalSort(ArrayList<Edge>[] graph){
+        boolean vis[] = new boolean[graph.length];
+        Stack<Integer> stack = new Stack<>();
+        for(int i = 0;i<graph.length;i++){
+            if(vis[i]==false){
+                topologicalSortUtil(graph, vis, stack, i);
+            }
+        }
+
+        while(!stack.isEmpty()){
+            System.out.println(stack.pop());
+        }
+    }
+
+
 
     static class Edge{
         int src;
